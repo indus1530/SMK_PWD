@@ -25,7 +25,7 @@ import edu.aku.hassannaqvi.smk_pwd.contracts.UsersContract;
 import edu.aku.hassannaqvi.smk_pwd.contracts.VersionAppContract;
 import edu.aku.hassannaqvi.smk_pwd.core.DatabaseHelper;
 import edu.aku.hassannaqvi.smk_pwd.core.MainApp;
-import edu.aku.hassannaqvi.smk_pwd.otherClasses.SyncModel;
+import edu.aku.hassannaqvi.smk_pwd.models.SyncModel;
 
 /**
  * Created by ali.azaz on 7/14/2017.
@@ -35,7 +35,7 @@ public class GetAllData extends AsyncTask<String, String, String> {
 
     private HttpURLConnection urlConnection;
     private SyncListAdapter adapter;
-    private List<SyncModel> list;
+    private List<edu.aku.hassannaqvi.smk_pwd.models.SyncModel> list;
     private int position;
     private String TAG = "";
     private final Context mContext;
@@ -186,7 +186,7 @@ public class GetAllData extends AsyncTask<String, String, String> {
                     } catch (JSONException e1) {
                         e1.printStackTrace();
                     }
-                    Log.d(TAG, "downloadUrl: " + json.toString());
+                    Log.d(TAG, "downloadUrl: " + json);
                     wr.writeBytes(json.toString());
                     wr.flush();
                     wr.close();

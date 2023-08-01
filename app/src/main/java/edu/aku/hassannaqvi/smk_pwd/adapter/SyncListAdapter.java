@@ -1,6 +1,7 @@
 package edu.aku.hassannaqvi.smk_pwd.adapter;
 
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +14,11 @@ import java.util.List;
 
 import edu.aku.hassannaqvi.smk_pwd.R;
 import edu.aku.hassannaqvi.smk_pwd.databinding.SyncListAdapterBinding;
-import edu.aku.hassannaqvi.smk_pwd.otherClasses.SyncModel;
+import edu.aku.hassannaqvi.smk_pwd.models.SyncModel;
+
 
 public class SyncListAdapter extends RecyclerView.Adapter<SyncListAdapter.SyncListViewHolder> {
+    private static final String TAG = "SyncListAdapter";
     List<SyncModel> synclist;
     SyncListViewHolder holder;
 
@@ -45,7 +48,7 @@ public class SyncListAdapter extends RecyclerView.Adapter<SyncListAdapter.SyncLi
 
     @Override
     public int getItemCount() {
-        return synclist.size() > 0 ? synclist.size() : 0;
+        return Math.max(synclist.size(), 0);
     }
 
     private int checkStatus(int i) {
@@ -56,6 +59,8 @@ public class SyncListAdapter extends RecyclerView.Adapter<SyncListAdapter.SyncLi
                 return Color.YELLOW;
             case 3:
                 return Color.GREEN;
+            case 4:
+                return Color.GRAY;
             default:
                 return Color.BLACK;
         }
@@ -73,10 +78,16 @@ public class SyncListAdapter extends RecyclerView.Adapter<SyncListAdapter.SyncLi
 
         public void bindUser(SyncModel model) {
             binding.statusColor.setBackgroundColor(checkStatus(model.getstatusID()));
-            binding.tvTableName.setText(model.gettableName());
+            String tableName = model.getTableTitle().toUpperCase();
+
+            binding.tvTableName.setText(tableName);
+            binding.tvInfo.setText(model.getInfo());
             binding.tvStatus.setText(model.getstatus());
+            Log.d(TAG, "bindUser: " + tableName + " - " + model.getmessage());
+            if (tableName.contains("VERSION") && model.getmessage().contains("New"))
+                binding.tvMsg.setTextColor(Color.RED);
             binding.tvMsg.setText(model.getmessage());
-            if (model.getstatusID() == 1 || model.getstatusID() == 3) {
+            if (model.getstatusID() == 1 || model.getstatusID() == 3 || model.getstatusID() == 4) {
                 binding.pb.setVisibility(View.GONE);
             } else {
                 binding.pb.setVisibility(View.VISIBLE);

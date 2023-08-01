@@ -15,7 +15,9 @@
         android:layout_height="match_parent"
         android:fillViewport="true">
 
-        <LinearLayout style="@style/vlinearlayout">
+        <LinearLayout
+            style="@style/vlinearlayout"
+            android:gravity="center">
 
             <TextView
                 android:id="@+id/lblMainMenu"

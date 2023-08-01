@@ -101,4 +101,17 @@ dependencies {
     //PopUp Sheet
     implementation 'com.github.whalemare:sheetmenu:2.0.1'
 
+    def work_version = '2.7.0'
+
+    // WorkManager(Java only)
+    implementation "androidx.work:work-runtime:$work_version"
+
+    // Sqlcipher
+    implementation "net.zetetic:android-database-sqlcipher:4.5.0"
+    implementation "androidx.sqlite:sqlite-ktx:2.2.0"
+    implementation "androidx.sqlite:sqlite:2.2.0"
+
+    // Permissions Handeling
+    implementation 'com.karumi:dexter:6.2.3'
+
 }

@@ -1,5 +1,10 @@
 package edu.aku.hassannaqvi.smk_pwd.ui.other;
 
+import static java.lang.Thread.sleep;
+import static edu.aku.hassannaqvi.smk_pwd.core.MainApp.PROJECT_NAME;
+import static edu.aku.hassannaqvi.smk_pwd.core.MainApp.userName;
+import static edu.aku.hassannaqvi.smk_pwd.utils.UtilKt.getPermissionsList;
+
 import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -48,6 +53,13 @@ import androidx.core.app.ActivityCompat;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.Target;
 import com.github.amlcurran.showcaseview.targets.ViewTarget;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+
+import net.sqlcipher.database.SQLiteException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -58,6 +70,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -65,14 +78,13 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import edu.aku.hassannaqvi.smk_pwd.CONSTANTS;
 import edu.aku.hassannaqvi.smk_pwd.R;
+import edu.aku.hassannaqvi.smk_pwd.contracts.TableContracts;
 import edu.aku.hassannaqvi.smk_pwd.core.AppInfo;
 import edu.aku.hassannaqvi.smk_pwd.core.DatabaseHelper;
 import edu.aku.hassannaqvi.smk_pwd.core.MainApp;
+import edu.aku.hassannaqvi.smk_pwd.models.EntryLog;
 import edu.aku.hassannaqvi.smk_pwd.ui.sync.SyncActivity;
 import edu.aku.hassannaqvi.smk_pwd.utils.CreateTable;
-
-import static edu.aku.hassannaqvi.smk_pwd.utils.UtilKt.getPermissionsList;
-import static java.lang.Thread.sleep;
 
 public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
@@ -103,6 +115,29 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Dexter.withContext(this)
+                .withPermissions(
+                        Manifest.permission.ACCESS_NETWORK_STATE,
+                        Manifest.permission.WAKE_LOCK,
+                        Manifest.permission.INTERNET,
+                        Manifest.permission.READ_PHONE_STATE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_PHONE_STATE,
+                        Manifest.permission.CAMERA
+                ).withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+                        if (report.areAllPermissionsGranted()) {
+                            MainApp.permissionCheck = true;
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                        token.continuePermissionRequest();
+                    }
+                }).check();
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
@@ -180,7 +215,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                 editor.apply();
             }
 
-            File folder = new File(Environment.getExternalStorageDirectory() + File.separator + CreateTable.PROJECT_NAME);
+            File folder = new File(Environment.getExternalStorageDirectory() + File.separator + PROJECT_NAME);
             boolean success = true;
             if (!folder.exists()) {
                 success = folder.mkdirs();
@@ -283,6 +318,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             showProgress(true);
             mAuthTask = new UserLoginTask(this, email, password);
             mAuthTask.execute((Void) null);
+            recordEntry("First Login");
         }
     }
 
@@ -698,6 +734,32 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             mAuthTask = null;
             showProgress(false);
         }
+    }
+
+    private void recordEntry(String entryType) {
+
+        EntryLog entryLog = new EntryLog();
+        entryLog.setProjectName(PROJECT_NAME);
+        entryLog.setUserName(userName);
+        entryLog.setEntryDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH).format(new Date().getTime()));
+        entryLog.setAppver(MainApp.appInfo.getAppVersion());
+        entryLog.setEntryType(entryType);
+        entryLog.setDeviceId(MainApp.deviceId);
+        Long rowId = null;
+        try {
+            rowId = db.addEntryLog(entryLog);
+        } catch (SQLiteException e) {
+            Toast.makeText(this, "SQLiteException(EntryLog)" + entryLog, Toast.LENGTH_SHORT).show();
+        }
+        if (rowId != -1) {
+            entryLog.setId(String.valueOf(rowId));
+            //entryLog.setUid(entryLog.getDeviceId() + entryLog.getId());
+            entryLog.setUid(MainApp.generateUid(entryLog.getDeviceId()));
+            db.updatesEntryLogColumn(TableContracts.EntryLogTable.COLUMN_UID, entryLog.getUid(), entryLog.getId());
+        } else {
+            Toast.makeText(this, R.string.upd_db_error, Toast.LENGTH_SHORT).show();
+        }
+
     }
 
 }

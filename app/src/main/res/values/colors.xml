@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!--<color name="colorPrimary">#255355</color>
+    <color name="colorPrimaryLight">#7B583D</color>
+    <color name="colorPrimaryDark">#233040</color>
+    <color name="colorAccent">#EA1736</color>-->
+    <color name="colorAccentLight">#FF6E40</color>
+
+    <!--<color name="colorPrimaryOverlay">#7f00ACC1</color>
+    <color name="colorPrimaryLightOverlay">#7f80DEEA</color>
+    <color name="colorPrimaryDarkOverlay">#7f00838F</color>
+    <color name="colorAccentOverlay">#7fFF3D00</color>
+    <color name="colorAccentLightOverlay">#7fFF6E40</color>-->
+
+
     <color name="colorAccent">#6200ea</color>
     <color name="colorPrimary">#311b92</color>
     <color name="colorPrimaryAlpha">#d7311b92</color>
@@ -9,6 +23,12 @@
     <color name="colorPrimaryDark">#000063</color>
     <color name="colorPrimaryDark1">#d7000063</color>
     <color name="colorPrimaryLight">#6746c3</color>
+
+    <color name="colorPrimaryOverlay">#7f00ACC1</color>
+    <color name="colorPrimaryLightOverlay">#7f80DEEA</color>
+    <color name="colorPrimaryDarkOverlay">#7f00838F</color>
+    <color name="colorAccentOverlay">#7fFF3D00</color>
+    <color name="colorAccentLightOverlay">#7fFF6E40</color>
 
     <color name="ticker_red">#64dd17</color>
     <color name="dullWhile">#f2f2f2</color>
@@ -77,5 +97,30 @@
     <color name="died">#33A5A5A5</color>
     <color name="refused">#33EC701C</color>
     <color name="dssIncorrect">#337f00ff</color>
+
+
+    <!-- Standard App Colors -->
+    <color name="grayDark">#5e5e5e</color>
+    <color name="grayDark1">#696969</color>
+    <color name="grayLight">#7f7f7f</color>
+    <color name="greenLight">#d600ef00</color>
+    <color name="redLight">#d6ef0000</color>
+    <!--<color name="gray">#898989</color>
+    <color name="green">#009900</color>-->
+    <!-- <color name="red_overlay">#7f990000</color>
+     <color name="green_overlay">#7f009900</color>-->
+    <!--<color name="blackOverlay">#7f000000</color>
+    <color name="whiteOverlay">#beffffff</color>-->
+    <color name="redDark">#990000</color>
+    <!--<color name="lightPink">#EEE4C4BA</color>-->
+    <color name="lightPink1">#7fefd6d6</color>
+
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <!--<color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>-->
 
 </resources>

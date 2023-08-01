@@ -1,5 +1,8 @@
 package edu.aku.hassannaqvi.smk_pwd.core;
 
+import static edu.aku.hassannaqvi.smk_pwd.core.DatabaseHelper.DATABASE_PASSWORD;
+import static edu.aku.hassannaqvi.smk_pwd.utils.CreateTable.DATABASE_NAME;
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -8,10 +11,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.format.DateFormat;
@@ -22,9 +31,16 @@ import androidx.core.app.ActivityCompat;
 
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
+import net.sqlcipher.database.SQLiteDatabase;
+
+import org.json.JSONArray;
+
+import java.io.File;
 import java.util.List;
+import java.util.Locale;
 
 import edu.aku.hassannaqvi.smk_pwd.contracts.FormsContract;
+import edu.aku.hassannaqvi.smk_pwd.contracts.UsersContract;
 import edu.aku.hassannaqvi.smk_pwd.models.Forms;
 import edu.aku.hassannaqvi.smk_pwd.models.Patients;
 import edu.aku.hassannaqvi.smk_pwd.ui.other.EndingActivity;
@@ -36,20 +52,20 @@ import kotlin.Pair;
  */
 
 public class MainApp extends Application {
-
-    public static final String TAG = "AppMain";
+    public static final String PROJECT_NAME = "smk_pwd";
+    public static final String _HOST_URL = MainApp._IP + "/" + PROJECT_NAME + "/api/";// .TEST server;
 
     /*VCOE1 LIVE SERVER*/
     public static final String _IP = "https://vcoe1.aku.edu"; // .Net server
 
     /*F38158 TEST SERVER*/
-    //public static final String _IP = "http://f38158";// .TEST server
-    public static final String _HOST_URL = MainApp._IP + "/smk_pwd/api/"; // .TEST server
-
-    public static final String _SERVER_URL = "sync.php";
-    public static final String _SERVER_GET_URL = "getData.php";
-
-    public static final String _UPDATE_URL = MainApp._IP + "/smk_pwd/app/";
+    //public static final String _IP = "http://cls-pae-fp51764";// .TEST server
+    public static final String _PHOTO_UPLOAD_URL = _HOST_URL + "uploads.php";
+    public static final String _SERVER_URL = "syncGCM.php";
+    public static final String _SERVER_GET_URL = "getDataGCM.php";
+    public static final String _UPDATE_URL = MainApp._IP + "/" + PROJECT_NAME + "/app/";
+    public static final String _USER_URL = "resetpassword.php";
+    public static final String _APP_FOLDER = "../app/survey";
 
 
     public static final Integer MONTHS_LIMIT = 11;
@@ -77,11 +93,21 @@ public class MainApp extends Application {
     public static OnItemClick countItemClick;
     public static AppInfo appInfo;
     public static Boolean admin = false;
+    public static final String _EMPTY_ = "";
     public static FormsContract fc;
     public static Patients psc;
     public static String userName = "0000";
     public static int deathCount = 0;
+    private static final String TAG = "MainApp";
     public static String DeviceURL = "devices.php";
+    public static UsersContract user;
+    public static int TRATS = 8;
+    public static String IBAHC = "";
+    public static File sdDir;
+    public static String[] downloadData;
+    public static List<JSONArray> uploadData;
+    public static boolean permissionCheck = false;
+    public static SharedPreferences.Editor editor;
 
     public static Forms form;
     public static String Mon1;
@@ -184,6 +210,27 @@ public class MainApp extends Application {
         alert.show();
     }
 
+    public static Boolean isNetworkAvailable(Context c) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) c.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Network nw = connectivityManager.getActiveNetwork();
+            if (nw == null) return false;
+            NetworkCapabilities actNw = connectivityManager.getNetworkCapabilities(nw);
+            return actNw != null && (actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH));
+        } else {
+            NetworkInfo nwInfo = connectivityManager.getActiveNetworkInfo();
+            return nwInfo != null && nwInfo.isConnected();
+        }
+    }
+
+    // Uid generation scheme
+    public static String generateUid(String deviceid) {
+        // Uid Scheme = 6 characters of device id + current date time in millis
+        String deviceIdSS = deviceid.substring(0, 6);
+        long timeInMillis = System.currentTimeMillis();
+        return String.format(Locale.getDefault(), "%s%d", deviceIdSS, timeInMillis);
+    }
+
 
     /*public static void endActivity(final Context context, final Activity activity, final Class EndActivityClass, final boolean complete, final Object objectData) {
         String message = "";
@@ -224,8 +271,9 @@ public class MainApp extends Application {
 
         //TypefaceUtil.overrideFont(getApplicationContext(), "SANS_SERIF", "fonts/JameelNooriNastaleeq.ttf");
 
-        deviceId = Settings.Secure.getString(getApplicationContext().getContentResolver(),
-                Settings.Secure.ANDROID_ID);
+        /*deviceId = Settings.Secure.getString(getApplicationContext().getContentResolver(),
+                Settings.Secure.ANDROID_ID);*/
+        deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
 
         // Requires Permission for GPS -- android.permission.ACCESS_FINE_LOCATION
@@ -256,6 +304,33 @@ public class MainApp extends Application {
 
         //Initiate DateTime
         AndroidThreeTen.init(this);
+        appInfo = new AppInfo(this);
+        sharedPref = getSharedPreferences(PROJECT_NAME, MODE_PRIVATE);
+        editor = sharedPref.edit();
+        deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        initSecure();
+    }
+
+    private void initSecure() {
+        // Initialize SQLCipher library
+        SQLiteDatabase.loadLibs(this);
+        File databaseFile = getDatabasePath(DATABASE_NAME);
+       /* databaseFile.mkdirs();
+        databaseFile.delete();*/
+        SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(databaseFile, DATABASE_PASSWORD, null);
+        // Prepare encryption KEY
+        ApplicationInfo ai = null;
+        try {
+            ai = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
+            Bundle bundle = ai.metaData;
+            TRATS = bundle.getInt("YEK_TRATS");
+            //IBAHC = bundle.getString("YEK_REVRES").substring(TRATS, TRATS + 16);
+            IBAHC = bundle.getString("YEK_REVRES");
+            Log.d(TAG, "onCreate: YEK_REVRES = " + IBAHC);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     protected void showCurrentLocation() {

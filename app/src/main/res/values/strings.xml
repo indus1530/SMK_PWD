@@ -17,6 +17,37 @@
     <string name="error_field_required">This field is required</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email completions." </string>
 
+    <string name="cancel">Cancel</string>
+    <string name="btnSave">Save</string>
+    <string name="btnEnd">Cancel</string>
+    <string name="signin">SIGN IN</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="newPassword">New Password</string>
+    <string name="confirmPassword">Confirm Password</string>
+    <string name="btnResetPassword">Reset Password</string>
+    <string name="action_database">Database Manager</string>
+    <string name="action_data_sync">Sync Data</string>
+    <string name="btnLogin">Login</string>
+    <string name="country">Language (Click to change)</string>
+    <string name="downData">Download Data</string>
+    <string name="lang">Language</string>
+    <string name="btnDownload">Download Data</string>
+    <string name="btnDownloadData">Download Data</string>
+    <string name="csMAexist">might be already exist</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!--Error Messages-->
+    <string name="upd_db_form">updateDB(Form):\t</string>
+    <string name="upd_db_error">Updating Database… ERROR!</string>
+    <string name="db_excp_error">Database Exception... ERROR!</string>
+    <string name="upd_db">Updating Database...\t</string>
+    <string name="fail_db_upd">Failed to Update Database!</string>
+    <string name="backPress">Back Press Not Allowed</string>
+    <string name="invalid_response">Invalid Response</string>
+    <string name="agecal">AgeCal:\t</string>
+    <string name="network_conn_error">Network Connection Not Available !</string>
+
 
     <string name="tdheading">SECTION D: HOUSEHOLD MEMBER’S INFORMATION</string>
     <string name="teheading">SECTION E: REPRODUCTIVE HEALTH (Complete this table for all married women aged 15 &#8211; 49 years in the household) </string>

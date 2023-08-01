@@ -1,5 +1,8 @@
 package edu.aku.hassannaqvi.smk_pwd.ui.sections;
 
+import static edu.aku.hassannaqvi.smk_pwd.core.MainApp.form;
+import static edu.aku.hassannaqvi.smk_pwd.utils.UtilKt.openSectionMainActivity;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -21,9 +24,6 @@ import edu.aku.hassannaqvi.smk_pwd.contracts.FormsContract;
 import edu.aku.hassannaqvi.smk_pwd.core.DatabaseHelper;
 import edu.aku.hassannaqvi.smk_pwd.core.MainApp;
 import edu.aku.hassannaqvi.smk_pwd.databinding.ActivitySectionF11Binding;
-
-import static edu.aku.hassannaqvi.smk_pwd.core.MainApp.form;
-import static edu.aku.hassannaqvi.smk_pwd.utils.UtilKt.openSectionMainActivity;
 
 public class SectionF11Activity extends AppCompatActivity {
 
@@ -97,7 +97,7 @@ public class SectionF11Activity extends AppCompatActivity {
     }
 
 
-    public void BtnContinue() {
+    public void BtnContinue(View view) {
         if (!formValidation()) return;
         SaveDraft();
         if (UpdateDB()) {
@@ -107,7 +107,7 @@ public class SectionF11Activity extends AppCompatActivity {
     }
 
 
-    public void BtnEnd() {
+    public void BtnEnd(View view) {
         openSectionMainActivity(this, "F");
     }
 

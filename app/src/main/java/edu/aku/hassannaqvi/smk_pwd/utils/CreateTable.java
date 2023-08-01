@@ -1,5 +1,7 @@
 package edu.aku.hassannaqvi.smk_pwd.utils;
 
+import static edu.aku.hassannaqvi.smk_pwd.core.MainApp.PROJECT_NAME;
+
 import edu.aku.hassannaqvi.smk_pwd.contracts.DistrictContract;
 import edu.aku.hassannaqvi.smk_pwd.contracts.FormsContract;
 import edu.aku.hassannaqvi.smk_pwd.contracts.HFContract;
@@ -10,10 +12,8 @@ import edu.aku.hassannaqvi.smk_pwd.contracts.UsersContract;
 import edu.aku.hassannaqvi.smk_pwd.contracts.VersionAppContract;
 
 public final class CreateTable {
-
-    public static final String DATABASE_NAME = "smk_pwd.db";
-    public static final String DB_NAME = "smk_pwd_copy.db";
-    public static final String PROJECT_NAME = "SMK_PWD2020";
+    public static final String DATABASE_NAME = PROJECT_NAME + ".db";
+    public static final String DB_NAME = PROJECT_NAME + "_copy.db";
     public static final int DATABASE_VERSION = 1;
 
     public static final String SQL_CREATE_FORMS = "CREATE TABLE "
